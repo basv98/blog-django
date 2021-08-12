@@ -1,5 +1,5 @@
 from django import forms
-from posts.models import Category, Posts
+from posts.models import Category, Posts, Likes
 
 class PostsForm(forms.Form):
     title = forms.CharField(required = True)
@@ -25,7 +25,7 @@ class PostFormEdit(PostsForm):
 
     def clean_post_id(self):
         post_id = self.cleaned_data['post_id']
-        exists_post = Category.objects.filter(id = post_id).exists()
+        exists_post = Posts.objects.filter(id = post_id).exists()
         if not exists_post:
             raise forms.ValidationError(f"El post con id {post_id} no existe")
         return post_id
@@ -35,3 +35,26 @@ class PostFormEdit(PostsForm):
         post_id = data['post_id']
         data.pop("post_id")
         Posts.objects.filter(id = post_id).update(**data)
+
+class LikeForm(forms.Form):
+    post_id = forms.IntegerField(required = True)
+
+    def clean_post_id(self):
+        post_id = self.cleaned_data['post_id']
+        exists_post = Posts.objects.filter(id = post_id).exists()
+        if not exists_post:
+            raise forms.ValidationError(f"El post con id {post_id} no existe")
+        return post_id
+
+
+    def save(self, user_id):
+        data = self.cleaned_data
+        data["user_id"] = user_id
+        Likes.objects.create(**data)
+
+
+def isset_post(post_id):
+    exists_post = Posts.objects.filter(id = post_id).exists()
+    if not exists_post:
+        raise forms.ValidationError(f"El post con id {post_id} no existe")
+

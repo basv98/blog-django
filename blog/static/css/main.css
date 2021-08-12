@@ -5,3 +5,13 @@
     padding: 100px;
     border-radius: 30px;
 }
+
+.card-posts-text {
+    height: 100px;
+}
+
+.not-active { 
+    pointer-events: none; 
+    cursor: default; 
+    background-color: gray;
+} 

@@ -1,14 +1,14 @@
-from django.shortcuts import render
-from posts.models import Category , Posts
-from posts.forms import PostsForm, PostFormEdit
-from django.views.generic.edit import FormView
+from django.shortcuts import render, redirect
+from posts.models import Category , Posts, Likes
+from posts.forms import PostsForm, PostFormEdit, LikeForm
+from django.views.generic import FormView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
-# Create your views here.
-def home(request):
-    posts = Posts.objects.all()
-    return render(request, "posts/home.html", {"posts" : posts})
+class HomeView(LoginRequiredMixin, ListView):
+    template_name = "posts/home.html"
+    model = Posts
+    context_object_name = "posts"
 
 
 class PostFormView(LoginRequiredMixin,FormView):
@@ -27,15 +27,21 @@ class PostFormView(LoginRequiredMixin,FormView):
         form.save(self.request.user.id)
         return super().form_valid(form)
 
-def detail(request, post_id):
+def detail(request, post_id, context = {}):
     post = Posts.objects.get(id = post_id)
+    have_like = Likes.objects.filter(post_id = post_id, user_id = request.user.id).exists()
 
     can_edit = False
     if post.user.id == request.user.id:
         can_edit = True
         
     return render(request, "posts/detail.html",  
-            {"post" : post, "can_edit" : can_edit},
+            {
+                "post" : post, 
+                "can_edit" : can_edit, 
+                "have_like" : have_like,
+                **context
+            },
            )
 
 class EditFormViw(LoginRequiredMixin, FormView):
@@ -55,6 +61,18 @@ class EditFormViw(LoginRequiredMixin, FormView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('detail', kwargs={'post_id': self.kwargs['post_id']})
+
+
+    
+def like(request, post_id):
+    form = LikeForm({"post_id" : post_id})
+    if form.is_valid():
+        have_like =  Likes.objects.filter(post_id = post_id, user_id = request.user.id).exists()
+        if not have_like:
+            form.save(request.user.id)
+
+    return detail(request, post_id, {"form" : form})
+    
 
 
 

@@ -17,7 +17,7 @@ class AccesUserMiddleware:
         if request.path in [reverse("edit",kwargs={'post_id': self.post_id})]:
             can_edit = Posts.objects.filter(id = self.post_id, user_id = request.user.id).exists()
             if not can_edit:
-                redirect("home")
+                return redirect("home")
         return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):

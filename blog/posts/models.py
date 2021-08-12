@@ -13,3 +13,9 @@ class Posts(models.Model):
     cetegory = models.ForeignKey(Category, on_delete = models.DO_NOTHING)
     create = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+
+class Likes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    create = models.DateTimeField(auto_now_add=True)
