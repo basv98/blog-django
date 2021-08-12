@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block container %}
+{% include "nav.html" %}
+<div class="container mt-5">
+    <form method="POST">
+        <input type="hidden" name="post_id" value="{{ post.id }}">
+        {% include "posts/formPost.html" %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block container %}
+{% include "nav.html" %}
+<div class="container mt-5">
+    <form method="POST">
+        {% include "posts/formPost.html" %}
+    </form>
+</div>
+{% endblock %}
